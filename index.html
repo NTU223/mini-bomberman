@@ -2,15 +2,15 @@
   <head>
     <style>canvas{ border: 1px solid; }</style>
   </head>
-  <body style="background-color: black;">
-    <canvas id="screen" width="512" height="512"></canvas>
+  <body style="background-color: black; overflow: hidden;">
+    <canvas id="screen" width="1024" height="1024"></canvas>
   </body>
   <script>
     var canvas = document.getElementById('screen');
     var ctx = canvas.getContext('2d');
     var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     var rows = 15, cols = 31;
-    var size = 16;
+    var size = 24;
     var map = new Array(rows);
     var men = [];
 
@@ -45,15 +45,31 @@
             else if (this.x > Math.floor(this.x) + 0.5)
               this.x -= this.speed;
           }
-
-          console.log(this.x, this.y);
         }
       }
+      this.fixPosition();
     };
 
-    function collision(x, y, direction) {
-      x = Math.floor(x) + move[direction][0];
-      y = Math.floor(y) + move[direction][1];
+    Bomberman.prototype.fixPosition = function() {
+      function fix(val) {
+        return Math.round(val * 10) / 10;
+      }
+
+      this.x = fix(this.x);
+      this.y = fix(this.y);
+    }
+
+    function collision(ox, oy, direction) {
+      x = Math.floor(ox) + move[direction][0];
+      y = Math.floor(oy) + move[direction][1];
+      if (direction == 0 && ox > Math.floor(ox) + 0.5)
+        return false;
+      if (direction == 2 && ox < Math.floor(ox) + 0.5)
+        return false;
+      if (direction == 1 && oy < Math.floor(oy) + 0.5)
+        return false;
+      if (direction == 3 && oy > Math.floor(oy) + 0.5)
+        return false;
       return !(0 <= x && x < rows && 0 <= y && y < cols && map[x][y] == 0);
     }
 
