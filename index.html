@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <style>canvas{ border: 1px solid; }</style>
+  </head>
+  <body style="background-color: black;">
+    <canvas id="screen" width="512" height="512"></canvas>
+  </body>
+  <script>
+    var canvas = document.getElementById('screen');
+    var ctx = canvas.getContext('2d');
+    var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+    var rows = 32, cols = 32;
+
+    function rec(x1, y1, x2, y2, color) {
+      ctx.beginPath();
+      ctx.rect(x1, y1, x2 - x1, y2 - y1);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+      ctx.stroke();
+    };
+
+    function draw() {
+      rec(0, 0, 512, 512, 'rgb(154, 207, 130)');
+    };
+
+    function doKey(e) {
+    };
+    document.onkeydown = doKey;
+
+    function daemon() {
+      // TODO
+      draw();
+    };
+    setInterval(daemon, 100);
+  </script>
+</html>
