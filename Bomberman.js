@@ -1,14 +1,19 @@
 function Bomberman(x, y, key, color) {
-  this.x = x;
+  this.speed = 100;
+  this.scale = 1000;
+  this.x = x; // Grid position
   this.y = y;
+  this.scaledX = (x + 0.5) * this.scale; // Detail position
+  this.scaledY = (y + 0.5) * this.scale;
   this.key = key;
   this.color = color;
-  this.speed = 0.1;
   this.direction = -1;
 }
 
 Bomberman.prototype.draw = function() {
-  drawCircle(this.x * size, this.y * size, size / 2, this.color);
+  var x = this.scaledX / this.scale;
+  var y = this.scaledY / this.scale;
+  drawCircle(x * size, y * size, size / 2, this.color);
 };
 
 Bomberman.prototype.setDirectionDown = function(direction) {
@@ -22,49 +27,47 @@ Bomberman.prototype.setDirectionUp = function(direction) {
 
 Bomberman.prototype.move = function() {
   if (this.direction != -1) {
-    if (!this.collision(this.x, this.y, this.direction)) {
-      this.x += this.speed * move[this.direction][0];
-      this.y += this.speed * move[this.direction][1];
+    if (!this.collision()) {
+      this.scaledX += this.speed * move[this.direction][0];
+      this.scaledY += this.speed * move[this.direction][1];
+      this.fixPosition();
 
       if (this.direction % 2 == 0) {
-        if (this.y < Math.floor(this.y) + 0.5)
-          this.y += this.speed;
-        else if (this.y > Math.floor(this.y) + 0.5)
-          this.y -= this.speed;
+        if (this.scaledY < (this.y + 0.5) * this.scale)
+          this.scaledY += this.speed;
+        else if (this.scaledY > (this.y + 0.5) * this.scale)
+          this.scaledY -= this.speed;
       } else {
-        if (this.x < Math.floor(this.x) + 0.5)
-          this.x += this.speed;
-        else if (this.x > Math.floor(this.x) + 0.5)
-          this.x -= this.speed;
+        if (this.scaledX < (this.x + 0.5) * this.scale)
+          this.scaledX += this.speed;
+        else if (this.scaledX > (this.x + 0.5) * this.scale)
+          this.scaledX -= this.speed;
       }
+      this.fixPosition();
     }
   }
-  this.fixPosition();
 };
 
 Bomberman.prototype.fixPosition = function() {
-  function fix(val) {
-    return Math.round(val * 10) / 10;
-  }
-
-  this.x = fix(this.x);
-  this.y = fix(this.y);
+  this.x = Math.floor(this.scaledX / this.scale);
+  this.y = Math.floor(this.scaledY / this.scale);
 }
 
 Bomberman.prototype.setBomb = function() {
-  map[Math.floor(this.x)][Math.floor(this.y)] = 1;
+  map[this.x][this.y] = new Bomb(this.x, this.y);
 }
 
-Bomberman.prototype.collision = function(ox, oy, direction) {
-  x = Math.floor(ox) + move[direction][0];
-  y = Math.floor(oy) + move[direction][1];
-  if (direction == 0 && ox > Math.floor(ox) + 0.5)
+Bomberman.prototype.collision = function() {
+  var x = this.x + move[this.direction][0];
+  var y = this.y + move[this.direction][1];
+
+  if (this.direction == 0 && this.scaledX > (this.x + 0.5) * this.scale)
     return false;
-  if (direction == 2 && ox < Math.floor(ox) + 0.5)
+  if (this.direction == 2 && this.scaledX < (this.x + 0.5) * this.scale)
     return false;
-  if (direction == 1 && oy < Math.floor(oy) + 0.5)
+  if (this.direction == 1 && this.scaledY < (this.y + 0.5) * this.scale)
     return false;
-  if (direction == 3 && oy > Math.floor(oy) + 0.5)
+  if (this.direction == 3 && this.scaledY > (this.y + 0.5) * this.scale)
     return false;
   return !(0 <= x && x < rows && 0 <= y && y < cols && map[x][y] == undefined);
 }

@@ -8,6 +8,7 @@
   <script type="text/javascript" src="Bomberman.js"></script>
   <script type="text/javascript" src="CanvasUtils.js"></script>
   <script type="text/javascript" src="Obstacle.js"></script>
+  <script type="text/javascript" src="Bomb.js"></script>
   <script>
     var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     var rows = 15, cols = 31;
@@ -44,8 +45,8 @@
           else
             map[i][j] = undefined;
         }
-      players.push(new Bomberman(0.5, 0.5, [38, 39, 40, 37, 32], "white"));
-      players.push(new Bomberman(0.5, 1.5, [87, 68, 83, 65, 32], "blue"));
+      players.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
+      players.push(new Bomberman(0, 1, [87, 68, 83, 65, 32], "blue"));
       setInterval(daemon, 17);
     }
 
