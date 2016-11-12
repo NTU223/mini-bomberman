@@ -8,7 +8,7 @@ function Bomberman(x, y, key, color) {
   this.key = key;
   this.color = color;
   this.direction = -1;
-}
+};
 
 Bomberman.prototype.draw = function() {
   var x = this.scaledX / this.scale;
@@ -18,12 +18,12 @@ Bomberman.prototype.draw = function() {
 
 Bomberman.prototype.setDirectionDown = function(direction) {
   this.direction = direction;
-}
+};
 
 Bomberman.prototype.setDirectionUp = function(direction) {
   if (this.direction == direction)
     this.direction = -1;
-}
+};
 
 Bomberman.prototype.move = function() {
   if (this.direction != -1) {
@@ -51,11 +51,15 @@ Bomberman.prototype.move = function() {
 Bomberman.prototype.fixPosition = function() {
   this.x = Math.floor(this.scaledX / this.scale);
   this.y = Math.floor(this.scaledY / this.scale);
-}
+};
 
 Bomberman.prototype.setBomb = function() {
-  map[this.x][this.y] = new Bomb(this.x, this.y);
-}
+  if (map[this.x][this.y] == undefined) {
+    var bomb = new Bomb(this.x, this.y, this, 2);
+    map[this.x][this.y] = bomb;
+    bombs.push(bomb);
+  }
+};
 
 Bomberman.prototype.collision = function() {
   var x = this.x + move[this.direction][0];
@@ -70,4 +74,4 @@ Bomberman.prototype.collision = function() {
   if (this.direction == 3 && this.scaledY > (this.y + 0.5) * this.scale)
     return false;
   return !(0 <= x && x < rows && 0 <= y && y < cols && map[x][y] == undefined);
-}
+};

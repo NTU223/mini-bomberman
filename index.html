@@ -15,6 +15,7 @@
     var size = 24;
     var map = new Array(rows);
     var players = [];
+    var bombs = [];
 
     function draw() {
       drawRectangle(0, 0, rows * size, cols * size, 'rgb(154, 207, 130)');
@@ -26,14 +27,24 @@
       players.forEach(function(player) {
         player.draw();
       });
-    }
+    };
 
     function daemon() {
+      while (bombs.length > 0 && bombs[0].explosionTime <= 0) {
+        bombs[0].remove();
+        bombs.shift();
+      }
+
+      bombs.forEach(function(bomb) {
+        bomb.count();
+      });
+
       players.forEach(function(player) {
         player.move();
       });
+
       draw();
-    }
+    };
 
     function init() {
       for (var i = 0; i < rows; i++)
@@ -46,9 +57,9 @@
             map[i][j] = undefined;
         }
       players.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
-      players.push(new Bomberman(0, 1, [87, 68, 83, 65, 32], "blue"));
+      players.push(new Bomberman(0, 1, [87, 68, 83, 65, undefined], "blue"));
       setInterval(daemon, 17);
-    }
+    };
 
     window.onload = init;
 

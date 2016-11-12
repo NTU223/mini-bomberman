@@ -8,7 +8,7 @@ function drawRectangle(x1, y1, x2, y2, color) {
   ctx.fill();
   ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
   ctx.stroke();
-}
+};
 
 function drawCircle(x, y, r, color) {
   ctx.beginPath();
@@ -18,4 +18,4 @@ function drawCircle(x, y, r, color) {
   ctx.fill();
   ctx.strokeStyle = 'black';
   ctx.stroke();
-}
+};
