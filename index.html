@@ -5,136 +5,32 @@
   <body style="background-color: black; overflow: hidden;">
     <canvas id="screen" width="1024" height="1024"></canvas>
   </body>
+  <script type="text/javascript" src="Bomberman.js"></script>
+  <script type="text/javascript" src="CanvasUtils.js"></script>
+  <script type="text/javascript" src="Obstacle.js"></script>
   <script>
-    var canvas = document.getElementById('screen');
-    var ctx = canvas.getContext('2d');
     var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     var rows = 15, cols = 31;
     var size = 24;
     var map = new Array(rows);
-    var men = [];
-
-    function Bomberman(x, y, key, id) {
-      this.x = x;
-      this.y = y;
-      this.key = key;
-      this.id = id;
-      this.speed = 0.1;
-      this.direction = -1;
-    }
-
-    Bomberman.prototype.draw = function() {
-      cir(this.x * size, this.y * size, size / 2, 'black');
-      cir(this.x * size, this.y * size, 0.5, 'black');
-    };
-
-    Bomberman.prototype.move = function(direction) {
-      if (this.direction != -1) {
-        if (!collision(this.x, this.y, this.direction)) {
-          this.x += this.speed * move[this.direction][0];
-          this.y += this.speed * move[this.direction][1];
-
-          if (this.direction % 2 == 0) {
-            if (this.y < Math.floor(this.y) + 0.5)
-              this.y += this.speed;
-            else if (this.y > Math.floor(this.y) + 0.5)
-              this.y -= this.speed;
-          } else {
-            if (this.x < Math.floor(this.x) + 0.5)
-              this.x += this.speed;
-            else if (this.x > Math.floor(this.x) + 0.5)
-              this.x -= this.speed;
-          }
-        }
-      }
-      this.fixPosition();
-    };
-
-    Bomberman.prototype.fixPosition = function() {
-      function fix(val) {
-        return Math.round(val * 10) / 10;
-      }
-
-      this.x = fix(this.x);
-      this.y = fix(this.y);
-    }
-
-    function collision(ox, oy, direction) {
-      x = Math.floor(ox) + move[direction][0];
-      y = Math.floor(oy) + move[direction][1];
-      if (direction == 0 && ox > Math.floor(ox) + 0.5)
-        return false;
-      if (direction == 2 && ox < Math.floor(ox) + 0.5)
-        return false;
-      if (direction == 1 && oy < Math.floor(oy) + 0.5)
-        return false;
-      if (direction == 3 && oy > Math.floor(oy) + 0.5)
-        return false;
-      return !(0 <= x && x < rows && 0 <= y && y < cols && map[x][y] == 0);
-    }
-
-    function rec(x1, y1, x2, y2, color) {
-      ctx.beginPath();
-      ctx.rect(y1, x1, y2 - y1, x2 - x1);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
-      ctx.stroke();
-    }
-
-    function cir(x, y, r, color) {
-      ctx.beginPath();
-      ctx.arc(y, x, r, 0, 2*Math.PI);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = color;
-      ctx.stroke();
-    }
-
-    function drawBombermen() {
-      men.forEach(function(man) {
-        man.draw();
-      });
-    }
+    var players = [];
 
     function draw() {
-      rec(0, 0, rows * size, cols * size, 'rgb(154, 207, 130)');
+      drawRectangle(0, 0, rows * size, cols * size, 'rgb(154, 207, 130)');
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++)
           if (map[i][j])
-            rec(i * size, j * size, (i + 1) * size, (j + 1) * size, 'black');
-      drawBombermen();
-    }
-
-    function doKeydown(e) {
-      men.forEach(function(man) {
-        for (var j = 0; j < 4; j++)
-          if (e.keyCode == man.key[j]){
-            man.direction = j;
-            return false;
-          }
-      });
-    }
-    function doKeyup(e) {
-      men.forEach(function(man) {
-        for (var j = 0; j < 4; j++)
-          if (e.keyCode == man.key[j]){
-            if (man.direction == j)
-              man.direction = -1;
-            return false;
-          }
-      });
-    }
-    document.onkeydown = doKeydown;
-    document.onkeyup = doKeyup;
-
-    function moveBombermen() {
-      men.forEach(function(man) {
-        man.move();
+            map[i][j].draw();
+      
+      players.forEach(function(player) {
+        player.draw();
       });
     }
 
     function daemon() {
-      moveBombermen();
+      players.forEach(function(player) {
+        player.move();
+      });
       draw();
     }
 
@@ -144,14 +40,38 @@
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++) {
           if (i % 2 == 1 && j % 2 == 1)
-            map[i][j] = 1;
+            map[i][j] = new Obstacle(i, j);
           else
-            map[i][j] = 0;
+            map[i][j] = undefined;
         }
-      men.push(new Bomberman(0.5, 0.5, [38, 39, 40, 37], 1));
+      players.push(new Bomberman(0.5, 0.5, [38, 39, 40, 37, 32], "white"));
+      players.push(new Bomberman(0.5, 1.5, [87, 68, 83, 65, 32], "blue"));
       setInterval(daemon, 17);
     }
 
     window.onload = init;
+
+    function doKeydown(e) {
+      players.forEach(function(player) {
+        for (var j = 0; j < 4; j++)
+          if (e.keyCode == player.key[j]){
+            player.setDirectionDown(j);
+            return false;
+          }
+        if (e.keyCode == player.key[4])
+          player.setBomb();
+      });
+    }
+    function doKeyup(e) {
+      players.forEach(function(player) {
+        for (var j = 0; j < 4; j++)
+          if (e.keyCode == player.key[j]){
+            player.setDirectionUp(j);
+            return false;
+          }
+      });
+    }
+    document.onkeydown = doKeydown;
+    document.onkeyup = doKeyup;
   </script>
 </html>
