@@ -9,6 +9,7 @@
   <script type="text/javascript" src="CanvasUtils.js"></script>
   <script type="text/javascript" src="Obstacle.js"></script>
   <script type="text/javascript" src="Bomb.js"></script>
+  <script type="text/javascript" src="Brick.js"></script>
   <script>
     // Array Remove - By John Resig (MIT Licensed)
     Array.prototype.remove = function(from, to) {
@@ -61,8 +62,12 @@
         for (var j = 0; j < cols; j++) {
           if (i % 2 == 1 && j % 2 == 1)
             map[i][j] = new Obstacle(i, j);
-          else
-            map[i][j] = undefined;
+          else {
+            if (Math.random() > 0.5 && !((i < 2 || i >= rows - 2) && (j < 2 || j >= cols - 2)))
+              map[i][j] = new Brick(i, j);
+            else
+              map[i][j] = undefined;
+          }
         }
       players.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
       players.push(new Bomberman(14, 30, [87, 68, 83, 65, 16], "blue"));
