@@ -8,6 +8,8 @@ function Bomberman(x, y, key, color) {
   this.key = key;
   this.color = color;
   this.direction = -1;
+  this.bombPower = 4;
+  this.remainBomb = 6;
 };
 
 Bomberman.prototype.draw = function() {
@@ -54,10 +56,11 @@ Bomberman.prototype.fixPosition = function() {
 };
 
 Bomberman.prototype.setBomb = function() {
-  if (map[this.x][this.y] == undefined) {
-    var bomb = new Bomb(this.x, this.y, this, 2);
+  if (this.remainBomb > 0 && map[this.x][this.y] == undefined) {
+    var bomb = new Bomb(this.x, this.y, this, this.bombPower);
     map[this.x][this.y] = bomb;
     bombs.push(bomb);
+    this.remainBomb--;
   }
 };
 

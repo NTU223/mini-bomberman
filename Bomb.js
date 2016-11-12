@@ -28,6 +28,7 @@ Bomb.prototype.count = function() {
 
 Bomb.prototype.remove = function() {
   map[this.x][this.y] = undefined;
+  this.setter.remainBomb++;
 };
 
 Bomb.prototype.touch = function() {
