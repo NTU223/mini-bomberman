@@ -10,7 +10,7 @@ function Bomb(x, y, setter, power) {
 
 Bomb.prototype.draw = function() {
   if (this.remainTime > 0) {
-    drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 2, 'black');
+    drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 2 - (this.remainTime / 30) % 2, 'black');
   } else {
     this.fireRecord.forEach(function(record) {
       drawRectangle(record.x * size, record.y * size, (record.x + 1) * size, (record.y + 1) * size, 'red');

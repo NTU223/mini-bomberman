@@ -1,6 +1,6 @@
 function Bomberman(x, y, key, color) {
-  this.speed = 100;
-  this.scale = 1000;
+  this.speed = 420;
+  this.scale = 4200;
   this.x = x; // Grid position
   this.y = y;
   this.scaledX = (x + 0.5) * this.scale; // Detail position
