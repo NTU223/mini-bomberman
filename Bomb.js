@@ -52,6 +52,17 @@ Bomb.prototype.explosion = function() {
           }
         }
       }
+    } else {
+      this.fireRecord.forEach(function(record) {
+        if (map[record.x][record.y] != undefined)
+          map[record.x][record.y].touch();
+        players.forEach(function(player) {
+          if (record.x == player.x && record.y == player.y) {
+            var idx = players.indexOf(player);
+            players.remove(idx, idx);
+          }
+        })
+      });
     }
   }
   this.explosionTime--;

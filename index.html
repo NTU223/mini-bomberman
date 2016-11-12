@@ -10,6 +10,13 @@
   <script type="text/javascript" src="Obstacle.js"></script>
   <script type="text/javascript" src="Bomb.js"></script>
   <script>
+    // Array Remove - By John Resig (MIT Licensed)
+    Array.prototype.remove = function(from, to) {
+      var rest = this.slice((to || from) + 1 || this.length);
+      this.length = from < 0 ? this.length + from : from;
+      return this.push.apply(this, rest);
+    };
+
     var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     var rows = 15, cols = 31;
     var size = 24;
@@ -40,7 +47,8 @@
       });
 
       players.forEach(function(player) {
-        player.move();
+        if (!player.die)
+          player.move();
       });
 
       draw();
