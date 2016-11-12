@@ -8,8 +8,8 @@ function Bomberman(x, y, key, color) {
   this.key = key;
   this.color = color;
   this.direction = -1;
-  this.bombPower = 4;
-  this.remainBomb = 6;
+  this.bombPower = 2;
+  this.remainBomb = 2;
 };
 
 Bomberman.prototype.draw = function() {
@@ -46,6 +46,8 @@ Bomberman.prototype.move = function() {
           this.scaledX -= this.speed;
       }
       this.fixPosition();
+      if (map[this.x][this.y] != undefined && map[this.x][this.y].constructor.name == 'Item')
+        map[this.x][this.y].touch(this);
     }
   }
 };
@@ -76,5 +78,5 @@ Bomberman.prototype.collision = function() {
     return false;
   if (this.direction == 3 && this.scaledY > (this.y + 0.5) * this.scale)
     return false;
-  return !(0 <= x && x < rows && 0 <= y && y < cols && map[x][y] == undefined);
+  return !(0 <= x && x < rows && 0 <= y && y < cols && (map[x][y] == undefined || map[x][y].constructor.name == 'Item'));
 };

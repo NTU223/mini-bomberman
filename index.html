@@ -10,6 +10,7 @@
   <script type="text/javascript" src="Obstacle.js"></script>
   <script type="text/javascript" src="Bomb.js"></script>
   <script type="text/javascript" src="Brick.js"></script>
+  <script type="text/javascript" src="Item.js"></script>
   <script>
     // Array Remove - By John Resig (MIT Licensed)
     Array.prototype.remove = function(from, to) {
@@ -51,6 +52,11 @@
         if (!player.die)
           player.move();
       });
+
+      for (var i = 0; i < rows; i++)
+        for (var j = 0; j < cols; j++)
+          if (map[i][j] != undefined && map[i][j].constructor.name == 'Brick')
+            map[i][j].remove();
 
       draw();
     };
