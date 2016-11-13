@@ -18,12 +18,13 @@ Brick.prototype.remove = function() {
   }
 };
 
+var itemProbability = [0.65, 0.15, 0]; // 35% 50% 15%
 Brick.prototype.touch = function() {
   this.touched = true;
   if (Math.random() > 0.66) {
     var tmp = Math.random();
-    for (var i = 0; i < 2; i++)
-      if (tmp > (1 - i) * 0.5) {
+    for (var i = 0; i < 3; i++)
+      if (tmp > itemProbability[i]) {
         map[this.x][this.y] = new Item(this.x, this.y, i + 1);
         break;
       }

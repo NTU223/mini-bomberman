@@ -28,7 +28,6 @@ Bomb.prototype.count = function() {
 
 Bomb.prototype.remove = function() {
   map[this.x][this.y] = undefined;
-  this.setter.remainBomb++;
 };
 
 Bomb.prototype.touch = function() {
@@ -38,6 +37,7 @@ Bomb.prototype.touch = function() {
 Bomb.prototype.explosion = function() {
   if (this.explosionTime > 0) {
     if (this.fireRecord.length == 0) {
+      this.setter.remainBomb++;
       this.fireRecord.push({x: this.x, y: this.y});
       for (var i = 0; i < 4; i++) {
         for (var j = 1; j <= this.power; j++) {

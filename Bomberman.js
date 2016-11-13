@@ -1,6 +1,9 @@
+var speedList = [10, 12, 15, 20];
+
 function Bomberman(x, y, key, color) {
-  this.speed = 420;
-  this.scale = 4200;
+  this.speedIndex = 0;
+  this.speed = 10;
+  this.scale = 120;
   this.x = x; // Grid position
   this.y = y;
   this.scaledX = (x + 0.5) * this.scale; // Detail position
@@ -80,3 +83,10 @@ Bomberman.prototype.collision = function() {
     return false;
   return !(0 <= x && x < rows && 0 <= y && y < cols && (map[x][y] == undefined || map[x][y].constructor.name == 'Item'));
 };
+
+Bomberman.prototype.addSpeed = function() {
+  if (this.speedIndex < 3)
+    this.speed = speedList[++this.speedIndex];
+  this.scaledX = Math.round((this.scaledX % this.scale) / this.speed) * this.speed + this.scaledX - this.scaledX % this.scale;
+  this.scaledY = Math.round((this.scaledY % this.scale) / this.speed) * this.speed + this.scaledY - this.scaledY % this.scale;
+}
