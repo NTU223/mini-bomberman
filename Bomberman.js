@@ -85,7 +85,7 @@ Bomberman.prototype.collision = function() {
 };
 
 Bomberman.prototype.addSpeed = function() {
-  if (this.speedIndex < 3)
+  if (this.speedIndex < 2)
     this.speed = speedList[++this.speedIndex];
   this.scaledX = Math.round((this.scaledX % this.scale) / this.speed) * this.speed + this.scaledX - this.scaledX % this.scale;
   this.scaledY = Math.round((this.scaledY % this.scale) / this.speed) * this.speed + this.scaledY - this.scaledY % this.scale;
