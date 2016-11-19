@@ -8,18 +8,9 @@
   <script>
     var sl = [10, 12, 15, 20];
     function Bomberman(x, y, k, c) {
-      this.si = 0;
-      this.sp = 10;
-      this.s = 120;
-      this.x = x;
-      this.y = y;
-      this.sx = (x + 0.5) * this.s;
-      this.sy = (y + 0.5) * this.s;
-      this.k = k;
-      this.c = c;
-      this.d = -1;
-      this.bp = 2;
-      this.rb = 2;
+      this.si = 0, this.sp = 10, this.s = 120, this.x = x, this.y = y;
+      this.sx = (x + 0.5) * this.s, this.sy = (y + 0.5) * this.s;
+      this.k = k, this.c = c, this.d = -1, this.bp = 2, this.rb = 2;
     };
     Bomberman.prototype.dw = function() {
       var x = this.sx / this.s;
@@ -33,15 +24,11 @@
           this.sy += this.sp * m[this.d][1];
           this.fp();
           if (this.d % 2 == 0) {
-            if (this.sy < (this.y + 0.5) * this.s)
-              this.sy += this.sp;
-            else if (this.sy > (this.y + 0.5) * this.s)
-              this.sy -= this.sp;
+            if (this.sy < (this.y + 0.5) * this.s)      this.sy += this.sp;
+            else if (this.sy > (this.y + 0.5) * this.s) this.sy -= this.sp;
           } else {
-            if (this.sx < (this.x + 0.5) * this.s)
-              this.sx += this.sp;
-            else if (this.sx > (this.x + 0.5) * this.s)
-              this.sx -= this.sp;
+            if (this.sx < (this.x + 0.5) * this.s)      this.sx += this.sp;
+            else if (this.sx > (this.x + 0.5) * this.s) this.sx -= this.sp;
           }
           this.fp();
           if (map[this.x][this.y] != undefined && map[this.x][this.y].constructor.name == 'Item')
@@ -56,27 +43,20 @@
     Bomberman.prototype.sb = function() {
       if (this.rb > 0 && map[this.x][this.y] == undefined) {
         var b = new Bomb(this.x, this.y, this, this.bp);
-        map[this.x][this.y] = b;
-        bs.push(b);
-        this.rb--;
+        map[this.x][this.y] = b, bs.push(b), this.rb--;
       }
     };
     Bomberman.prototype.col = function() {
       var x = this.x + m[this.d][0];
       var y = this.y + m[this.d][1];
-      if (this.d == 0 && this.sx > (this.x + 0.5) * this.s)
-        return false;
-      if (this.d == 2 && this.sx < (this.x + 0.5) * this.s)
-        return false;
-      if (this.d == 1 && this.sy < (this.y + 0.5) * this.s)
-        return false;
-      if (this.d == 3 && this.sy > (this.y + 0.5) * this.s)
-        return false;
+      if (this.d == 0 && this.sx > (this.x + 0.5) * this.s) return false;
+      if (this.d == 2 && this.sx < (this.x + 0.5) * this.s) return false;
+      if (this.d == 1 && this.sy < (this.y + 0.5) * this.s) return false;
+      if (this.d == 3 && this.sy > (this.y + 0.5) * this.s) return false;
       return !(0 <= x && x < rows && 0 <= y && y < cols && (map[x][y] == undefined || map[x][y].constructor.name == 'Item'));
     };
     Bomberman.prototype.as = function() {
-      if (this.si < 2)
-        this.sp = sl[++this.si];
+      if (this.si < 2) this.sp = sl[++this.si];
       this.sx = Math.round((this.sx % this.s) / this.sp) * this.sp + this.sx - this.sx % this.s;
       this.sy = Math.round((this.sy % this.s) / this.sp) * this.sp + this.sy - this.sy % this.s;
     }
@@ -84,81 +64,47 @@
     var canvas = document.getElementById('screen');
     var ctx = canvas.getContext('2d');
     function rec(x1, y1, x2, y2, c) {
-      ctx.beginPath();
-      ctx.rect(y1, x1, y2 - y1, x2 - x1);
-      ctx.fillStyle = c;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
-      ctx.stroke();
+      ctx.beginPath(), ctx.rect(y1, x1, y2 - y1, x2 - x1), ctx.fillStyle = c;
+      ctx.fill(), ctx.strokeStyle = 'rgba(0, 0, 0, 0)', ctx.stroke();
     };
     function cir(x, y, r, c) {
-      ctx.beginPath();
-      ctx.arc(y, x, r, 0, 2 * Math.PI);
-      ctx.lineWidth = 1;
-      ctx.fillStyle = c;
-      ctx.fill();
-      ctx.strokeStyle = 'black';
-      ctx.stroke();
+      ctx.beginPath(), ctx.arc(y, x, r, 0, 2 * Math.PI), ctx.lineWidth = 1;
+      ctx.fillStyle = c, ctx.fill(), ctx.strokeStyle = 'black', ctx.stroke();
     };
 
-    function Obstacle(x, y) {
-      this.x = x;
-      this.y = y;
-    };
+    function Obstacle(x, y) { this.x = x, this.y = y; };
     Obstacle.prototype.dw = function() {
       rec(this.x * sz, this.y * sz, (this.x + 1) * sz, (this.y + 1) * sz, 'black');
     };
-    Obstacle.prototype.t = function() {
-    };
+    Obstacle.prototype.t = function() {};
 
     function Bomb(x, y, st, p) {
-      this.x = x;
-      this.y = y;
-      this.st = st;
-      this.rt = 180;
-      this.ext = 25;
-      this.p = p;
-      this.fr = [];
+      this.x = x, this.y = y, this.st = st, this.rt = 180, this.ext = 25;
+      this.p = p, this.fr = [];
     };
     Bomb.prototype.dw = function() {
-      if (this.rt > 0) {
-        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 2 - (this.rt / 30) % 2, 'black');
-      } else {
-        this.fr.forEach(function(r) {
-          rec(r.x * sz, r.y * sz, (r.x + 1) * sz, (r.y + 1) * sz, '#FE642E');
-        });
-      }
+      if (this.rt > 0) cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 2 - (this.rt / 30) % 2, 'black');
+      else this.fr.forEach(function(r) { rec(r.x * sz, r.y * sz, (r.x + 1) * sz, (r.y + 1) * sz, '#FE642E'); });
     };
     Bomb.prototype.c = function() {
-      if (this.rt == 0) {
-        this.ex();
-      } else {
-        this.rt--;
-      }
+      if (this.rt == 0) this.ex();
+      else this.rt--;
     };
-    Bomb.prototype.rm = function() {
-      map[this.x][this.y] = undefined;
-    };
-    Bomb.prototype.t = function() {
-      this.rt = 0;
-    };
+    Bomb.prototype.rm = function() { map[this.x][this.y] = undefined; };
+    Bomb.prototype.t = function() { this.rt = 0; };
     Bomb.prototype.ex = function() {
       if (this.ext > 0) {
         if (this.fr.length == 0) {
-          this.st.rb++;
-          this.fr.push({x: this.x, y: this.y});
+          this.st.rb++, this.fr.push({x: this.x, y: this.y});
           for (var i = 0; i < 4; i++) {
             for (var j = 1; j <= this.p; j++) {
-              var x = this.x + m[i][0] * j;
-              var y = this.y + m[i][1] * j;
+              var x = this.x + m[i][0] * j, y = this.y + m[i][1] * j;
               if (0 <= x && x < rows && 0 <= y && y < cols && map[x][y] != undefined && map[x][y].constructor.name != 'Item') {
                 map[x][y].t();
                 break;
-              } else if (x < 0 || x >= rows || y < 0 || y >= cols) {
-                break;
-              } else{
-                this.fr.push({x: x, y: y});
               }
+              else if (x < 0 || x >= rows || y < 0 || y >= cols) break;
+              else this.fr.push({x: x, y: y});
             }
           }
         } else {
@@ -177,21 +123,14 @@
       this.ext--;
     };
 
-    function Brick(x, y) {
-      this.x = x;
-      this.y = y;
-      this.rt = 5;
-      this.td = false;
-    };
+    function Brick(x, y) { this.x = x, this.y = y, this.rt = 5, this.td = false; };
     Brick.prototype.dw = function() {
       rec(this.x * sz, this.y * sz, (this.x + 1) * sz, (this.y + 1) * sz, 'gray');
     };
     Brick.prototype.rm = function() {
       if (this.td) {
-        if (this.rt == 0)
-          map[this.x][this.y] = undefined;
-        else
-          this.rt--;
+        if (this.rt == 0) map[this.x][this.y] = undefined;
+        else this.rt--;
       }
     };
     var ip = [0.65, 0.15, 0];
@@ -207,34 +146,22 @@
       }
     };
 
-    function Item(x, y, tp) {
-      this.x = x;
-      this.y = y;
-      this.tp = tp;
-    };
+    function Item(x, y, tp) { this.x = x, this.y = y, this.tp = tp; };
     Item.prototype.dw = function() {
       var pd = 2;
       rec(this.x * sz + pd, this.y * sz + pd,
         (this.x + 1) * sz - pd, (this.y + 1) * sz - pd, 'green');
-      if (this.tp == 1)
-        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'black');
-      else if (this.tp == 2)
-        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'yellow');
-      else if (this.tp == 3)
-        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'blue');
+      if (this.tp == 1)      cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'black');
+      else if (this.tp == 2) cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'yellow');
+      else if (this.tp == 3) cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'blue');
     };
-    Item.prototype.rm = function() {
-      map[this.x][this.y] = undefined;
-    };
+    Item.prototype.rm = function() { map[this.x][this.y] = undefined; };
     Item.prototype.t = function(tr) {
       this.rm();
       if (tr != undefined) {
-        if (this.tp == 1)
-          tr.rb++;
-        else if (this.tp == 2)
-          tr.bp++;
-        else if (this.tp == 3)
-          tr.as();
+        if (this.tp == 1)      tr.rb++;
+        else if (this.tp == 2) tr.bp++;
+        else if (this.tp == 3) tr.as();
       }
     };
 
@@ -244,39 +171,23 @@
       return this.push.apply(this, rest);
     };
 
-    var m = [[-1, 0], [0, 1], [1, 0], [0, -1]];
-    var rows = 15, cols = 31;
-    var sz = 24;
-    var map = new Array(rows);
-    var ps = [];
-    var bs = [];
+    var m = [[-1, 0], [0, 1], [1, 0], [0, -1]], rows = 15, cols = 31, sz = 24;
+    var map = new Array(rows), ps = [], bs = [];
 
     function dw() {
       rec(0, 0, rows * sz, cols * sz, 'rgb(154, 207, 130)');
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++)
-          if (map[i][j])
-            map[i][j].dw();      
-      ps.forEach(function(p) {
-        p.dw();
-      });
+          if (map[i][j]) map[i][j].dw();      
+      ps.forEach(function(p) { p.dw(); });
     };
     function daemon() {
-      while (bs.length > 0 && bs[0].ext <= 0) {
-        bs[0].rm();
-        bs.shift();
-      }
-      bs.forEach(function(bomb) {
-        bomb.c();
-      });
-      ps.forEach(function(p) {
-        if (!p.die)
-          p.m();
-      });
+      while (bs.length > 0 && bs[0].ext <= 0) bs[0].rm(), bs.shift();
+      bs.forEach(function(b) { b.c(); });
+      ps.forEach(function(p) { if (!p.die) p.m(); });
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++)
-          if (map[i][j] != undefined && map[i][j].constructor.name == 'Brick')
-            map[i][j].rm();
+          if (map[i][j] != undefined && map[i][j].constructor.name == 'Brick') map[i][j].rm();
       dw();
     };
     function init() {
@@ -284,13 +195,11 @@
         map[i] = new Array(cols);
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++) {
-          if (i % 2 == 1 && j % 2 == 1)
-            map[i][j] = new Obstacle(i, j);
+          if (i % 2 == 1 && j % 2 == 1) map[i][j] = new Obstacle(i, j);
           else {
             if (Math.random() > 0.5 && !((i < 2 || i >= rows - 2) && (j < 2 || j >= cols - 2)))
               map[i][j] = new Brick(i, j);
-            else
-              map[i][j] = undefined;
+            else map[i][j] = undefined;
           }
         }
       ps.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
@@ -306,16 +215,14 @@
             p.d = j;
             return false;
           }
-        if (e.keyCode == p.k[4])
-          p.sb();
+        if (e.keyCode == p.k[4]) p.sb();
       });
     }
     function doKeyup(e) {
       ps.forEach(function(p) {
         for (var j = 0; j < 4; j++)
           if (e.keyCode == p.k[j]){
-            if (p.d == j)
-              p.d = -1;
+            if (p.d == j) p.d = -1;
             return false;
           }
       });
