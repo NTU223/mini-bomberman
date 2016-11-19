@@ -6,333 +6,279 @@
     <canvas id="screen" width="1024" height="1024"></canvas>
   </body>
   <script>
-    var speedList = [10, 12, 15, 20];
-
-    function Bomberman(x, y, key, color) {
-      this.speedIndex = 0;
-      this.speed = 10;
-      this.scale = 120;
-      this.x = x; // Grid position
+    var sl = [10, 12, 15, 20];
+    function Bomberman(x, y, k, c) {
+      this.si = 0;
+      this.sp = 10;
+      this.s = 120;
+      this.x = x;
       this.y = y;
-      this.scaledX = (x + 0.5) * this.scale; // Detail position
-      this.scaledY = (y + 0.5) * this.scale;
-      this.key = key;
-      this.color = color;
-      this.direction = -1;
-      this.bombPower = 2;
-      this.remainBomb = 2;
+      this.sx = (x + 0.5) * this.s;
+      this.sy = (y + 0.5) * this.s;
+      this.k = k;
+      this.c = c;
+      this.d = -1;
+      this.bp = 2;
+      this.rb = 2;
     };
-
-    Bomberman.prototype.draw = function() {
-      var x = this.scaledX / this.scale;
-      var y = this.scaledY / this.scale;
-      drawCircle(x * size, y * size, size / 2, this.color);
+    Bomberman.prototype.dw = function() {
+      var x = this.sx / this.s;
+      var y = this.sy / this.s;
+      cir(x * sz, y * sz, sz / 2, this.c);
     };
-
-    Bomberman.prototype.setDirectionDown = function(direction) {
-      this.direction = direction;
-    };
-
-    Bomberman.prototype.setDirectionUp = function(direction) {
-      if (this.direction == direction)
-        this.direction = -1;
-    };
-
-    Bomberman.prototype.move = function() {
-      if (this.direction != -1) {
-        if (!this.collision()) {
-          this.scaledX += this.speed * move[this.direction][0];
-          this.scaledY += this.speed * move[this.direction][1];
-          this.fixPosition();
-
-          if (this.direction % 2 == 0) {
-            if (this.scaledY < (this.y + 0.5) * this.scale)
-              this.scaledY += this.speed;
-            else if (this.scaledY > (this.y + 0.5) * this.scale)
-              this.scaledY -= this.speed;
+    Bomberman.prototype.m = function() {
+      if (this.d != -1) {
+        if (!this.col()) {
+          this.sx += this.sp * m[this.d][0];
+          this.sy += this.sp * m[this.d][1];
+          this.fp();
+          if (this.d % 2 == 0) {
+            if (this.sy < (this.y + 0.5) * this.s)
+              this.sy += this.sp;
+            else if (this.sy > (this.y + 0.5) * this.s)
+              this.sy -= this.sp;
           } else {
-            if (this.scaledX < (this.x + 0.5) * this.scale)
-              this.scaledX += this.speed;
-            else if (this.scaledX > (this.x + 0.5) * this.scale)
-              this.scaledX -= this.speed;
+            if (this.sx < (this.x + 0.5) * this.s)
+              this.sx += this.sp;
+            else if (this.sx > (this.x + 0.5) * this.s)
+              this.sx -= this.sp;
           }
-          this.fixPosition();
+          this.fp();
           if (map[this.x][this.y] != undefined && map[this.x][this.y].constructor.name == 'Item')
-            map[this.x][this.y].touch(this);
+            map[this.x][this.y].t(this);
         }
       }
     };
-
-    Bomberman.prototype.fixPosition = function() {
-      this.x = Math.floor(this.scaledX / this.scale);
-      this.y = Math.floor(this.scaledY / this.scale);
+    Bomberman.prototype.fp = function() {
+      this.x = Math.floor(this.sx / this.s);
+      this.y = Math.floor(this.sy / this.s);
     };
-
-    Bomberman.prototype.setBomb = function() {
-      if (this.remainBomb > 0 && map[this.x][this.y] == undefined) {
-        var bomb = new Bomb(this.x, this.y, this, this.bombPower);
-        map[this.x][this.y] = bomb;
-        bombs.push(bomb);
-        this.remainBomb--;
+    Bomberman.prototype.sb = function() {
+      if (this.rb > 0 && map[this.x][this.y] == undefined) {
+        var b = new Bomb(this.x, this.y, this, this.bp);
+        map[this.x][this.y] = b;
+        bs.push(b);
+        this.rb--;
       }
     };
-
-    Bomberman.prototype.collision = function() {
-      var x = this.x + move[this.direction][0];
-      var y = this.y + move[this.direction][1];
-
-      if (this.direction == 0 && this.scaledX > (this.x + 0.5) * this.scale)
+    Bomberman.prototype.col = function() {
+      var x = this.x + m[this.d][0];
+      var y = this.y + m[this.d][1];
+      if (this.d == 0 && this.sx > (this.x + 0.5) * this.s)
         return false;
-      if (this.direction == 2 && this.scaledX < (this.x + 0.5) * this.scale)
+      if (this.d == 2 && this.sx < (this.x + 0.5) * this.s)
         return false;
-      if (this.direction == 1 && this.scaledY < (this.y + 0.5) * this.scale)
+      if (this.d == 1 && this.sy < (this.y + 0.5) * this.s)
         return false;
-      if (this.direction == 3 && this.scaledY > (this.y + 0.5) * this.scale)
+      if (this.d == 3 && this.sy > (this.y + 0.5) * this.s)
         return false;
       return !(0 <= x && x < rows && 0 <= y && y < cols && (map[x][y] == undefined || map[x][y].constructor.name == 'Item'));
     };
-
-    Bomberman.prototype.addSpeed = function() {
-      if (this.speedIndex < 2)
-        this.speed = speedList[++this.speedIndex];
-      this.scaledX = Math.round((this.scaledX % this.scale) / this.speed) * this.speed + this.scaledX - this.scaledX % this.scale;
-      this.scaledY = Math.round((this.scaledY % this.scale) / this.speed) * this.speed + this.scaledY - this.scaledY % this.scale;
+    Bomberman.prototype.as = function() {
+      if (this.si < 2)
+        this.sp = sl[++this.si];
+      this.sx = Math.round((this.sx % this.s) / this.sp) * this.sp + this.sx - this.sx % this.s;
+      this.sy = Math.round((this.sy % this.s) / this.sp) * this.sp + this.sy - this.sy % this.s;
     }
-  </script>
 
-  <script>
     var canvas = document.getElementById('screen');
     var ctx = canvas.getContext('2d');
-
-    function drawRectangle(x1, y1, x2, y2, color) {
+    function rec(x1, y1, x2, y2, c) {
       ctx.beginPath();
       ctx.rect(y1, x1, y2 - y1, x2 - x1);
-      ctx.fillStyle = color;
+      ctx.fillStyle = c;
       ctx.fill();
       ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
       ctx.stroke();
     };
-
-    function drawCircle(x, y, r, color) {
+    function cir(x, y, r, c) {
       ctx.beginPath();
       ctx.arc(y, x, r, 0, 2 * Math.PI);
       ctx.lineWidth = 1;
-      ctx.fillStyle = color;
+      ctx.fillStyle = c;
       ctx.fill();
       ctx.strokeStyle = 'black';
       ctx.stroke();
     };
-  </script>
 
-  <script>
     function Obstacle(x, y) {
       this.x = x;
       this.y = y;
     };
-
-    Obstacle.prototype.draw = function() {
-      drawRectangle(this.x * size, this.y * size, (this.x + 1) * size, (this.y + 1) * size, 'black');
+    Obstacle.prototype.dw = function() {
+      rec(this.x * sz, this.y * sz, (this.x + 1) * sz, (this.y + 1) * sz, 'black');
+    };
+    Obstacle.prototype.t = function() {
     };
 
-    Obstacle.prototype.touch = function() {
-      // Do nothing.
-    };
-  </script>
-
-  <script>
-    function Bomb(x, y, setter, power) {
+    function Bomb(x, y, st, p) {
       this.x = x;
       this.y = y;
-      this.setter = setter;
-      this.remainTime = 180;
-      this.explosionTime = 25;
-      this.power = power;
-      this.fireRecord = [];
+      this.st = st;
+      this.rt = 180;
+      this.ext = 25;
+      this.p = p;
+      this.fr = [];
     };
-
-    Bomb.prototype.draw = function() {
-      if (this.remainTime > 0) {
-        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 2 - (this.remainTime / 30) % 2, 'black');
+    Bomb.prototype.dw = function() {
+      if (this.rt > 0) {
+        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 2 - (this.rt / 30) % 2, 'black');
       } else {
-        this.fireRecord.forEach(function(record) {
-          drawRectangle(record.x * size, record.y * size, (record.x + 1) * size, (record.y + 1) * size, '#FE642E');
+        this.fr.forEach(function(r) {
+          rec(r.x * sz, r.y * sz, (r.x + 1) * sz, (r.y + 1) * sz, '#FE642E');
         });
       }
     };
-
-    Bomb.prototype.count = function() {
-      if (this.remainTime == 0) {
-        this.explosion();
+    Bomb.prototype.c = function() {
+      if (this.rt == 0) {
+        this.ex();
       } else {
-        this.remainTime--;
+        this.rt--;
       }
     };
-
-    Bomb.prototype.remove = function() {
+    Bomb.prototype.rm = function() {
       map[this.x][this.y] = undefined;
     };
-
-    Bomb.prototype.touch = function() {
-      this.remainTime = 0;
+    Bomb.prototype.t = function() {
+      this.rt = 0;
     };
-
-    Bomb.prototype.explosion = function() {
-      if (this.explosionTime > 0) {
-        if (this.fireRecord.length == 0) {
-          this.setter.remainBomb++;
-          this.fireRecord.push({x: this.x, y: this.y});
+    Bomb.prototype.ex = function() {
+      if (this.ext > 0) {
+        if (this.fr.length == 0) {
+          this.st.rb++;
+          this.fr.push({x: this.x, y: this.y});
           for (var i = 0; i < 4; i++) {
-            for (var j = 1; j <= this.power; j++) {
-              var x = this.x + move[i][0] * j;
-              var y = this.y + move[i][1] * j;
+            for (var j = 1; j <= this.p; j++) {
+              var x = this.x + m[i][0] * j;
+              var y = this.y + m[i][1] * j;
               if (0 <= x && x < rows && 0 <= y && y < cols && map[x][y] != undefined && map[x][y].constructor.name != 'Item') {
-                map[x][y].touch();
+                map[x][y].t();
                 break;
               } else if (x < 0 || x >= rows || y < 0 || y >= cols) {
                 break;
               } else{
-                this.fireRecord.push({x: x, y: y});
+                this.fr.push({x: x, y: y});
               }
             }
           }
         } else {
-          this.fireRecord.forEach(function(record) {
-            if (map[record.x][record.y] != undefined)
-              map[record.x][record.y].touch();
-            players.forEach(function(player) {
-              if (record.x == player.x && record.y == player.y) {
-                var idx = players.indexOf(player);
-                players.remove(idx, idx);
+          this.fr.forEach(function(r) {
+            if (map[r.x][r.y] != undefined)
+              map[r.x][r.y].t();
+            ps.forEach(function(p) {
+              if (r.x == p.x && r.y == p.y) {
+                var idx = ps.indexOf(p);
+                ps.rm(idx, idx);
               }
             })
           });
         }
       }
-      this.explosionTime--;
+      this.ext--;
     };
-  </script>
 
-  <script>
     function Brick(x, y) {
       this.x = x;
       this.y = y;
-      this.remainTime = 5;
-      this.touched = false;
+      this.rt = 5;
+      this.td = false;
     };
-
-    Brick.prototype.draw = function() {
-      drawRectangle(this.x * size, this.y * size, (this.x + 1) * size, (this.y + 1) * size, 'gray');
+    Brick.prototype.dw = function() {
+      rec(this.x * sz, this.y * sz, (this.x + 1) * sz, (this.y + 1) * sz, 'gray');
     };
-
-    Brick.prototype.remove = function() {
-      if (this.touched) {
-        if (this.remainTime == 0)
+    Brick.prototype.rm = function() {
+      if (this.td) {
+        if (this.rt == 0)
           map[this.x][this.y] = undefined;
         else
-          this.remainTime--;
+          this.rt--;
       }
     };
-
-    var itemProbability = [0.65, 0.15, 0]; // 35% 50% 15%
-    Brick.prototype.touch = function() {
-      this.touched = true;
+    var ip = [0.65, 0.15, 0];
+    Brick.prototype.t = function() {
+      this.td = true;
       if (Math.random() > 0.66) {
         var tmp = Math.random();
         for (var i = 0; i < 3; i++)
-          if (tmp > itemProbability[i]) {
+          if (tmp > ip[i]) {
             map[this.x][this.y] = new Item(this.x, this.y, i + 1);
             break;
           }
       }
     };
-  </script>
 
-  <script>
-    function Item(x, y, type) {
+    function Item(x, y, tp) {
       this.x = x;
       this.y = y;
-      this.type = type;
+      this.tp = tp;
     };
-
-    Item.prototype.draw = function() {
-      var padding = 2;
-      drawRectangle(this.x * size + padding, this.y * size + padding,
-        (this.x + 1) * size - padding, (this.y + 1) * size - padding, 'green');
-      if (this.type == 1)
-        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'black');
-      else if (this.type == 2)
-        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'yellow');
-      else if (this.type == 3)
-        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'blue');
+    Item.prototype.dw = function() {
+      var pd = 2;
+      rec(this.x * sz + pd, this.y * sz + pd,
+        (this.x + 1) * sz - pd, (this.y + 1) * sz - pd, 'green');
+      if (this.tp == 1)
+        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'black');
+      else if (this.tp == 2)
+        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'yellow');
+      else if (this.tp == 3)
+        cir(this.x * sz + sz / 2, this.y * sz + sz / 2, sz / 4, 'blue');
     };
-
-    Item.prototype.remove = function() {
+    Item.prototype.rm = function() {
       map[this.x][this.y] = undefined;
     };
-
-    Item.prototype.touch = function(toucher) {
-      this.remove();
-      if (toucher != undefined) {
-        if (this.type == 1)
-          toucher.remainBomb++;
-        else if (this.type == 2)
-          toucher.bombPower++;
-        else if (this.type == 3)
-          toucher.addSpeed();
+    Item.prototype.t = function(tr) {
+      this.rm();
+      if (tr != undefined) {
+        if (this.tp == 1)
+          tr.rb++;
+        else if (this.tp == 2)
+          tr.bp++;
+        else if (this.tp == 3)
+          tr.as();
       }
     };
-  </script>
 
-  <script>
-    // Array Remove - By John Resig (MIT Licensed)
-    Array.prototype.remove = function(from, to) {
+    Array.prototype.rm = function(from, to) {
       var rest = this.slice((to || from) + 1 || this.length);
       this.length = from < 0 ? this.length + from : from;
       return this.push.apply(this, rest);
     };
 
-    var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+    var m = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     var rows = 15, cols = 31;
-    var size = 24;
+    var sz = 24;
     var map = new Array(rows);
-    var players = [];
-    var bombs = [];
+    var ps = [];
+    var bs = [];
 
-    function draw() {
-      drawRectangle(0, 0, rows * size, cols * size, 'rgb(154, 207, 130)');
+    function dw() {
+      rec(0, 0, rows * sz, cols * sz, 'rgb(154, 207, 130)');
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++)
           if (map[i][j])
-            map[i][j].draw();
-      
-      players.forEach(function(player) {
-        player.draw();
+            map[i][j].dw();      
+      ps.forEach(function(p) {
+        p.dw();
       });
     };
-
     function daemon() {
-      while (bombs.length > 0 && bombs[0].explosionTime <= 0) {
-        bombs[0].remove();
-        bombs.shift();
+      while (bs.length > 0 && bs[0].ext <= 0) {
+        bs[0].rm();
+        bs.shift();
       }
-
-      bombs.forEach(function(bomb) {
-        bomb.count();
+      bs.forEach(function(bomb) {
+        bomb.c();
       });
-
-      players.forEach(function(player) {
-        if (!player.die)
-          player.move();
+      ps.forEach(function(p) {
+        if (!p.die)
+          p.m();
       });
-
       for (var i = 0; i < rows; i++)
         for (var j = 0; j < cols; j++)
           if (map[i][j] != undefined && map[i][j].constructor.name == 'Brick')
-            map[i][j].remove();
-
-      draw();
+            map[i][j].rm();
+      dw();
     };
-
     function init() {
       for (var i = 0; i < rows; i++)
         map[i] = new Array(cols);
@@ -347,29 +293,29 @@
               map[i][j] = undefined;
           }
         }
-      players.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
-      players.push(new Bomberman(14, 30, [87, 68, 83, 65, 16], "blue"));
+      ps.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
+      ps.push(new Bomberman(14, 30, [87, 68, 83, 65, 16], "blue"));
       setInterval(daemon, 17);
     };
-
     window.onload = init;
 
     function doKeydown(e) {
-      players.forEach(function(player) {
+      ps.forEach(function(p) {
         for (var j = 0; j < 4; j++)
-          if (e.keyCode == player.key[j]){
-            player.setDirectionDown(j);
+          if (e.keyCode == p.k[j]){
+            p.d = j;
             return false;
           }
-        if (e.keyCode == player.key[4])
-          player.setBomb();
+        if (e.keyCode == p.k[4])
+          p.sb();
       });
     }
     function doKeyup(e) {
-      players.forEach(function(player) {
+      ps.forEach(function(p) {
         for (var j = 0; j < 4; j++)
-          if (e.keyCode == player.key[j]){
-            player.setDirectionUp(j);
+          if (e.keyCode == p.k[j]){
+            if (p.d == j)
+              p.d = -1;
             return false;
           }
       });
