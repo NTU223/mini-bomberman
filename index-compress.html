@@ -139,10 +139,7 @@
       if (Math.random() > 0.66) {
         var tmp = Math.random();
         for (var i = 0; i < 3; i++)
-          if (tmp > ip[i]) {
-            map[this.x][this.y] = new Item(this.x, this.y, i + 1);
-            break;
-          }
+          if (tmp > ip[i]) { map[this.x][this.y] = new Item(this.x, this.y, i + 1); break; }
       }
     };
 
@@ -170,7 +167,6 @@
       this.length = from < 0 ? this.length + from : from;
       return this.push.apply(this, rest);
     };
-
     var m = [[-1, 0], [0, 1], [1, 0], [0, -1]], rows = 15, cols = 31, sz = 24;
     var map = new Array(rows), ps = [], bs = [];
 
@@ -211,20 +207,14 @@
     function doKeydown(e) {
       ps.forEach(function(p) {
         for (var j = 0; j < 4; j++)
-          if (e.keyCode == p.k[j]){
-            p.d = j;
-            return false;
-          }
+          if (e.keyCode == p.k[j]){ p.d = j; return false; }
         if (e.keyCode == p.k[4]) p.sb();
       });
     }
     function doKeyup(e) {
       ps.forEach(function(p) {
         for (var j = 0; j < 4; j++)
-          if (e.keyCode == p.k[j]){
-            if (p.d == j) p.d = -1;
-            return false;
-          }
+          if (e.keyCode == p.k[j]){ if (p.d == j) p.d = -1; return false; }
       });
     }
     document.onkeydown = doKeydown;
