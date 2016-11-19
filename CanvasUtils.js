@@ -12,7 +12,7 @@ function drawRectangle(x1, y1, x2, y2, color) {
 
 function drawCircle(x, y, r, color) {
   ctx.beginPath();
-  ctx.arc(y, x, r, 0, 2*Math.PI);
+  ctx.arc(y, x, r, 0, 2 * Math.PI);
   ctx.lineWidth = 1;
   ctx.fillStyle = color;
   ctx.fill();

@@ -1,0 +1,380 @@
+<html>
+  <head>
+    <style>canvas{ border: 1px solid; }</style>
+  </head>
+  <body style="background-color: black; overflow: hidden;">
+    <canvas id="screen" width="1024" height="1024"></canvas>
+  </body>
+  <script>
+    var speedList = [10, 12, 15, 20];
+
+    function Bomberman(x, y, key, color) {
+      this.speedIndex = 0;
+      this.speed = 10;
+      this.scale = 120;
+      this.x = x; // Grid position
+      this.y = y;
+      this.scaledX = (x + 0.5) * this.scale; // Detail position
+      this.scaledY = (y + 0.5) * this.scale;
+      this.key = key;
+      this.color = color;
+      this.direction = -1;
+      this.bombPower = 2;
+      this.remainBomb = 2;
+    };
+
+    Bomberman.prototype.draw = function() {
+      var x = this.scaledX / this.scale;
+      var y = this.scaledY / this.scale;
+      drawCircle(x * size, y * size, size / 2, this.color);
+    };
+
+    Bomberman.prototype.setDirectionDown = function(direction) {
+      this.direction = direction;
+    };
+
+    Bomberman.prototype.setDirectionUp = function(direction) {
+      if (this.direction == direction)
+        this.direction = -1;
+    };
+
+    Bomberman.prototype.move = function() {
+      if (this.direction != -1) {
+        if (!this.collision()) {
+          this.scaledX += this.speed * move[this.direction][0];
+          this.scaledY += this.speed * move[this.direction][1];
+          this.fixPosition();
+
+          if (this.direction % 2 == 0) {
+            if (this.scaledY < (this.y + 0.5) * this.scale)
+              this.scaledY += this.speed;
+            else if (this.scaledY > (this.y + 0.5) * this.scale)
+              this.scaledY -= this.speed;
+          } else {
+            if (this.scaledX < (this.x + 0.5) * this.scale)
+              this.scaledX += this.speed;
+            else if (this.scaledX > (this.x + 0.5) * this.scale)
+              this.scaledX -= this.speed;
+          }
+          this.fixPosition();
+          if (map[this.x][this.y] != undefined && map[this.x][this.y].constructor.name == 'Item')
+            map[this.x][this.y].touch(this);
+        }
+      }
+    };
+
+    Bomberman.prototype.fixPosition = function() {
+      this.x = Math.floor(this.scaledX / this.scale);
+      this.y = Math.floor(this.scaledY / this.scale);
+    };
+
+    Bomberman.prototype.setBomb = function() {
+      if (this.remainBomb > 0 && map[this.x][this.y] == undefined) {
+        var bomb = new Bomb(this.x, this.y, this, this.bombPower);
+        map[this.x][this.y] = bomb;
+        bombs.push(bomb);
+        this.remainBomb--;
+      }
+    };
+
+    Bomberman.prototype.collision = function() {
+      var x = this.x + move[this.direction][0];
+      var y = this.y + move[this.direction][1];
+
+      if (this.direction == 0 && this.scaledX > (this.x + 0.5) * this.scale)
+        return false;
+      if (this.direction == 2 && this.scaledX < (this.x + 0.5) * this.scale)
+        return false;
+      if (this.direction == 1 && this.scaledY < (this.y + 0.5) * this.scale)
+        return false;
+      if (this.direction == 3 && this.scaledY > (this.y + 0.5) * this.scale)
+        return false;
+      return !(0 <= x && x < rows && 0 <= y && y < cols && (map[x][y] == undefined || map[x][y].constructor.name == 'Item'));
+    };
+
+    Bomberman.prototype.addSpeed = function() {
+      if (this.speedIndex < 2)
+        this.speed = speedList[++this.speedIndex];
+      this.scaledX = Math.round((this.scaledX % this.scale) / this.speed) * this.speed + this.scaledX - this.scaledX % this.scale;
+      this.scaledY = Math.round((this.scaledY % this.scale) / this.speed) * this.speed + this.scaledY - this.scaledY % this.scale;
+    }
+  </script>
+
+  <script>
+    var canvas = document.getElementById('screen');
+    var ctx = canvas.getContext('2d');
+
+    function drawRectangle(x1, y1, x2, y2, color) {
+      ctx.beginPath();
+      ctx.rect(y1, x1, y2 - y1, x2 - x1);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+      ctx.stroke();
+    };
+
+    function drawCircle(x, y, r, color) {
+      ctx.beginPath();
+      ctx.arc(y, x, r, 0, 2 * Math.PI);
+      ctx.lineWidth = 1;
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+    };
+  </script>
+
+  <script>
+    function Obstacle(x, y) {
+      this.x = x;
+      this.y = y;
+    };
+
+    Obstacle.prototype.draw = function() {
+      drawRectangle(this.x * size, this.y * size, (this.x + 1) * size, (this.y + 1) * size, 'black');
+    };
+
+    Obstacle.prototype.touch = function() {
+      // Do nothing.
+    };
+  </script>
+
+  <script>
+    function Bomb(x, y, setter, power) {
+      this.x = x;
+      this.y = y;
+      this.setter = setter;
+      this.remainTime = 180;
+      this.explosionTime = 25;
+      this.power = power;
+      this.fireRecord = [];
+    };
+
+    Bomb.prototype.draw = function() {
+      if (this.remainTime > 0) {
+        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 2 - (this.remainTime / 30) % 2, 'black');
+      } else {
+        this.fireRecord.forEach(function(record) {
+          drawRectangle(record.x * size, record.y * size, (record.x + 1) * size, (record.y + 1) * size, '#FE642E');
+        });
+      }
+    };
+
+    Bomb.prototype.count = function() {
+      if (this.remainTime == 0) {
+        this.explosion();
+      } else {
+        this.remainTime--;
+      }
+    };
+
+    Bomb.prototype.remove = function() {
+      map[this.x][this.y] = undefined;
+    };
+
+    Bomb.prototype.touch = function() {
+      this.remainTime = 0;
+    };
+
+    Bomb.prototype.explosion = function() {
+      if (this.explosionTime > 0) {
+        if (this.fireRecord.length == 0) {
+          this.setter.remainBomb++;
+          this.fireRecord.push({x: this.x, y: this.y});
+          for (var i = 0; i < 4; i++) {
+            for (var j = 1; j <= this.power; j++) {
+              var x = this.x + move[i][0] * j;
+              var y = this.y + move[i][1] * j;
+              if (0 <= x && x < rows && 0 <= y && y < cols && map[x][y] != undefined && map[x][y].constructor.name != 'Item') {
+                map[x][y].touch();
+                break;
+              } else if (x < 0 || x >= rows || y < 0 || y >= cols) {
+                break;
+              } else{
+                this.fireRecord.push({x: x, y: y});
+              }
+            }
+          }
+        } else {
+          this.fireRecord.forEach(function(record) {
+            if (map[record.x][record.y] != undefined)
+              map[record.x][record.y].touch();
+            players.forEach(function(player) {
+              if (record.x == player.x && record.y == player.y) {
+                var idx = players.indexOf(player);
+                players.remove(idx, idx);
+              }
+            })
+          });
+        }
+      }
+      this.explosionTime--;
+    };
+  </script>
+
+  <script>
+    function Brick(x, y) {
+      this.x = x;
+      this.y = y;
+      this.remainTime = 5;
+      this.touched = false;
+    };
+
+    Brick.prototype.draw = function() {
+      drawRectangle(this.x * size, this.y * size, (this.x + 1) * size, (this.y + 1) * size, 'gray');
+    };
+
+    Brick.prototype.remove = function() {
+      if (this.touched) {
+        if (this.remainTime == 0)
+          map[this.x][this.y] = undefined;
+        else
+          this.remainTime--;
+      }
+    };
+
+    var itemProbability = [0.65, 0.15, 0]; // 35% 50% 15%
+    Brick.prototype.touch = function() {
+      this.touched = true;
+      if (Math.random() > 0.66) {
+        var tmp = Math.random();
+        for (var i = 0; i < 3; i++)
+          if (tmp > itemProbability[i]) {
+            map[this.x][this.y] = new Item(this.x, this.y, i + 1);
+            break;
+          }
+      }
+    };
+  </script>
+
+  <script>
+    function Item(x, y, type) {
+      this.x = x;
+      this.y = y;
+      this.type = type;
+    };
+
+    Item.prototype.draw = function() {
+      var padding = 2;
+      drawRectangle(this.x * size + padding, this.y * size + padding,
+        (this.x + 1) * size - padding, (this.y + 1) * size - padding, 'green');
+      if (this.type == 1)
+        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'black');
+      else if (this.type == 2)
+        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'yellow');
+      else if (this.type == 3)
+        drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'blue');
+    };
+
+    Item.prototype.remove = function() {
+      map[this.x][this.y] = undefined;
+    };
+
+    Item.prototype.touch = function(toucher) {
+      this.remove();
+      if (toucher != undefined) {
+        if (this.type == 1)
+          toucher.remainBomb++;
+        else if (this.type == 2)
+          toucher.bombPower++;
+        else if (this.type == 3)
+          toucher.addSpeed();
+      }
+    };
+  </script>
+
+  <script>
+    // Array Remove - By John Resig (MIT Licensed)
+    Array.prototype.remove = function(from, to) {
+      var rest = this.slice((to || from) + 1 || this.length);
+      this.length = from < 0 ? this.length + from : from;
+      return this.push.apply(this, rest);
+    };
+
+    var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+    var rows = 15, cols = 31;
+    var size = 24;
+    var map = new Array(rows);
+    var players = [];
+    var bombs = [];
+
+    function draw() {
+      drawRectangle(0, 0, rows * size, cols * size, 'rgb(154, 207, 130)');
+      for (var i = 0; i < rows; i++)
+        for (var j = 0; j < cols; j++)
+          if (map[i][j])
+            map[i][j].draw();
+      
+      players.forEach(function(player) {
+        player.draw();
+      });
+    };
+
+    function daemon() {
+      while (bombs.length > 0 && bombs[0].explosionTime <= 0) {
+        bombs[0].remove();
+        bombs.shift();
+      }
+
+      bombs.forEach(function(bomb) {
+        bomb.count();
+      });
+
+      players.forEach(function(player) {
+        if (!player.die)
+          player.move();
+      });
+
+      for (var i = 0; i < rows; i++)
+        for (var j = 0; j < cols; j++)
+          if (map[i][j] != undefined && map[i][j].constructor.name == 'Brick')
+            map[i][j].remove();
+
+      draw();
+    };
+
+    function init() {
+      for (var i = 0; i < rows; i++)
+        map[i] = new Array(cols);
+      for (var i = 0; i < rows; i++)
+        for (var j = 0; j < cols; j++) {
+          if (i % 2 == 1 && j % 2 == 1)
+            map[i][j] = new Obstacle(i, j);
+          else {
+            if (Math.random() > 0.5 && !((i < 2 || i >= rows - 2) && (j < 2 || j >= cols - 2)))
+              map[i][j] = new Brick(i, j);
+            else
+              map[i][j] = undefined;
+          }
+        }
+      players.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
+      players.push(new Bomberman(14, 30, [87, 68, 83, 65, 16], "blue"));
+      setInterval(daemon, 17);
+    };
+
+    window.onload = init;
+
+    function doKeydown(e) {
+      players.forEach(function(player) {
+        for (var j = 0; j < 4; j++)
+          if (e.keyCode == player.key[j]){
+            player.setDirectionDown(j);
+            return false;
+          }
+        if (e.keyCode == player.key[4])
+          player.setBomb();
+      });
+    }
+    function doKeyup(e) {
+      players.forEach(function(player) {
+        for (var j = 0; j < 4; j++)
+          if (e.keyCode == player.key[j]){
+            player.setDirectionUp(j);
+            return false;
+          }
+      });
+    }
+    document.onkeydown = doKeydown;
+    document.onkeyup = doKeyup;
+  </script>
+</html>
