@@ -3,7 +3,7 @@
     <style>canvas{ border: 1px solid; }</style>
   </head>
   <body style="background-color: black; overflow: hidden;">
-    <canvas id="screen" width="1024" height="1024"></canvas>
+    <canvas id="screen" width="1576" height="1024"></canvas>
   </body>
   <script type="text/javascript" src="Bomberman.js"></script>
   <script type="text/javascript" src="CanvasUtils.js"></script>
@@ -21,7 +21,7 @@
 
     var move = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     var rows = 15, cols = 31;
-    var size = 24;
+    var size = 48;
     var map = new Array(rows);
     var players = [];
     var bombs = [];
@@ -76,7 +76,8 @@
           }
         }
       players.push(new Bomberman(0, 0, [38, 39, 40, 37, 32], "white"));
-      players.push(new Bomberman(14, 30, [87, 68, 83, 65, 16], "blue"));
+      players.push(new Bomberman(14, 30, [87, 68, 83, 65, 192], "blue"));
+      players.push(new Bomberman(14, 0, [73, 76, 75, 74, 90], "red"));
       setInterval(daemon, 17);
     };
 
