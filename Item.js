@@ -14,6 +14,8 @@ Item.prototype.draw = function() {
     drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'yellow');
   else if (this.type == 3)
     drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'blue');
+  else if (this.type == 4)
+    drawCircle(this.x * size + size / 2, this.y * size + size / 2, size / 4, 'red');
 };
 
 Item.prototype.remove = function() {
@@ -29,5 +31,7 @@ Item.prototype.touch = function(toucher) {
       toucher.bombPower++;
     else if (this.type == 3)
       toucher.addSpeed();
+    else if (this.type == 4)
+      toucher.throwRange++;
   }
 };

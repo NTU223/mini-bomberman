@@ -11,8 +11,10 @@ function Bomberman(x, y, key, color) {
   this.key = key;
   this.color = color;
   this.direction = -1;
+  this.previousDirection = -1;
   this.bombPower = 2;
   this.remainBomb = 2;
+  this.throwRange = 5;
 };
 
 Bomberman.prototype.draw = function() {
@@ -26,8 +28,10 @@ Bomberman.prototype.setDirectionDown = function(direction) {
 };
 
 Bomberman.prototype.setDirectionUp = function(direction) {
-  if (this.direction == direction)
+  if (this.direction == direction) {
+    this.previousDirection = this.direction;
     this.direction = -1;
+  }
 };
 
 Bomberman.prototype.move = function() {
@@ -66,6 +70,23 @@ Bomberman.prototype.setBomb = function() {
     map[this.x][this.y] = bomb;
     bombs.push(bomb);
     this.remainBomb--;
+  } else {
+    var availablePosition = [];
+    for (var i = 1; i <= this.throwRange; i++) {
+      var x = this.x + move[this.previousDirection][0] * i;
+      var y = this.y + move[this.previousDirection][1] * i;
+      if (map[x][y] == undefined)
+        availablePosition.push({x: x, y: y});
+    }
+    if (availablePosition.length > 0) {
+      var chooseIndex = Math.floor(Math.random() * availablePosition.length);
+      var x = availablePosition[chooseIndex].x;
+      var y = availablePosition[chooseIndex].y;
+      map[x][y] = map[this.x][this.y];
+      map[this.x][this.y] = undefined;
+      map[x][y].x = x;
+      map[x][y].y = y;
+    }
   }
 };
 
