@@ -39,9 +39,19 @@
     };
 
     function daemon() {
+      /*
       while (bombs.length > 0 && bombs[0].explosionTime <= 0) {
         bombs[0].remove();
         bombs.shift();
+      }
+      */
+
+      for (var i = 0; i < bombs.length; i++) {
+        if (bombs[i].explosionTime <= 0) {
+          bombs[i].remove();
+          bombs.remove(i, i);
+          i--;
+        }
       }
 
       bombs.forEach(function(bomb) {
